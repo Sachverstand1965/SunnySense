@@ -1,0 +1,16 @@
+{
+  "title": "Self-learning Is Sunny",
+  "config": {"step": {"user": {
+    "title": "Choose source entities",
+    "description": "PV power and solar position are required; lux, cloud cover and temperature guard learning.",
+    "data": {
+      "pv_entity": "PV power", "azimuth_entity": "Solar azimuth",
+      "elevation_entity": "Solar elevation", "lux_entity": "Illuminance",
+      "cloud_entity": "Cloud cover", "temperature_entity": "Outdoor temperature"
+    }
+  }}, "abort": {"already_configured": "The helper is already configured."}},
+  "options": {"step": {"init": {"title": "Decision settings", "data": {
+    "on_threshold": "On threshold", "off_threshold": "Off threshold",
+    "min_elevation": "Minimum solar elevation", "min_samples": "Minimum reference samples"
+  }}}}
+}

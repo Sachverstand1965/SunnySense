@@ -1,0 +1,34 @@
+"""Constants for Self-learning Is Sunny."""
+
+DOMAIN = "is_sunny"
+PLATFORMS = ["binary_sensor"]
+
+CONF_PV = "pv_entity"
+CONF_AZIMUTH = "azimuth_entity"
+CONF_ELEVATION = "elevation_entity"
+CONF_LUX = "lux_entity"
+CONF_CLOUD = "cloud_entity"
+CONF_TEMPERATURE = "temperature_entity"
+CONF_ON_THRESHOLD = "on_threshold"
+CONF_OFF_THRESHOLD = "off_threshold"
+CONF_MIN_ELEVATION = "min_elevation"
+CONF_MIN_SAMPLES = "min_samples"
+
+DEFAULTS = {
+    CONF_PV: "sensor.solaredge_aktuelle_leistung",
+    CONF_AZIMUTH: "sensor.sun_solar_azimuth",
+    CONF_ELEVATION: "sensor.sun_solar_elevation",
+    CONF_LUX: "sensor.bewegungsmelder_garten_illuminance",
+    CONF_CLOUD: "sensor.dwd_bewoelkung",
+    CONF_TEMPERATURE: "sensor.openweathermap_temperature",
+    CONF_ON_THRESHOLD: 0.82,
+    CONF_OFF_THRESHOLD: 0.68,
+    CONF_MIN_ELEVATION: 5.0,
+    CONF_MIN_SAMPLES: 6,
+}
+
+FACADES = (
+    {"name": "northeast", "bearing": 25.0, "start": 340.0, "end": 90.0},
+    {"name": "southwest", "bearing": 205.0, "start": 140.0, "end": 270.0},
+    {"name": "northwest", "bearing": 295.0, "start": 250.0, "end": 340.0},
+)

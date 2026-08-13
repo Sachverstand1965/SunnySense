@@ -1,0 +1,7 @@
+{
+  "name": "Self-learning Is Sunny",
+  "content_in_root": false,
+  "country": ["DE"],
+  "homeassistant": "2025.1.0",
+  "render_readme": true
+}

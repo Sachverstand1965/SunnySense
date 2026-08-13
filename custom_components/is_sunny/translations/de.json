@@ -1,0 +1,16 @@
+{
+  "title": "Selbstlernender Sonnensensor",
+  "config": {"step": {"user": {
+    "title": "Datenquellen auswählen",
+    "description": "PV-Leistung und Sonnenstand sind erforderlich; Lux, Bewölkung und Temperatur sichern das Lernen ab.",
+    "data": {
+      "pv_entity": "PV-Leistung", "azimuth_entity": "Sonnenazimut",
+      "elevation_entity": "Sonnenelevation", "lux_entity": "Beleuchtungsstärke",
+      "cloud_entity": "Bewölkung", "temperature_entity": "Außentemperatur"
+    }
+  }}, "abort": {"already_configured": "Der Helfer ist bereits eingerichtet."}},
+  "options": {"step": {"init": {"title": "Entscheidung einstellen", "data": {
+    "on_threshold": "Einschaltschwelle", "off_threshold": "Ausschaltschwelle",
+    "min_elevation": "Minimale Sonnenhöhe", "min_samples": "Minimale Referenzwerte"
+  }}}}
+}
