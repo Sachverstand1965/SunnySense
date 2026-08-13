@@ -3,9 +3,9 @@
 [![Validate](https://github.com/Sachverstand1965/SunnySense/actions/workflows/validate.yml/badge.svg)](https://github.com/Sachverstand1965/SunnySense/actions/workflows/validate.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/Sachverstand1965/SunnySense)](https://github.com/Sachverstand1965/SunnySense/releases)
 
-Eine lokale Custom Integration, die genau einen `binary_sensor.is_sunny` für
-Adaptive Cover Pro bereitstellt. Intern nutzt sie getrennte Referenzmodelle für
-die Fassaden 25°, 205° und 295°.
+Eine lokale Custom Integration für Adaptive Cover Pro. Sie stellt einen Sensor
+für die drei senkrechten Fassaden sowie einen getrennten Sensor für das geneigte
+Dachfenster bereit.
 
 ## Funktionsprinzip
 
@@ -49,6 +49,21 @@ eingetragen. Während eine Sonnenstandsregion noch nicht mindestens sechs
 Referenzbeobachtungen besitzt, ist der Zustand absichtlich `unknown`; Adaptive
 Cover Pro kann dann auf seine Wetterlogik zurückfallen.
 
+Für das Dachfenster wird stattdessen
+`binary_sensor.is_sunny_roof_window` verwendet.
+
+## Bereitgestellte Entitäten
+
+| Entität | Verwendung |
+|---|---|
+| `binary_sensor.is_sunny` | Fassadenfenster 25°, 205° und 295° |
+| `binary_sensor.is_sunny_roof_window` | Dachfenster 25° mit 42° Neigung |
+
+Der Dachfenstersensor berechnet den tatsächlichen Einfallswinkel auf die
+geneigte Scheibe. Er wird geometrisch freigegeben, wenn der Einfallsfaktor
+`cos(Einfallswinkel)` mindestens 0,10 beträgt. Für ihn werden eine eigene
+PV-Referenzkurve und eigene adaptive Schwellen gespeichert.
+
 ## Fassadenbereiche
 
 | Modell | Ausrichtung | aktiver Sonnenazimut |
@@ -68,6 +83,33 @@ Gebäudeüberstände oder Bäume können eine spätere Anpassung erfordern.
 `active_facade`, `facade_bearing`, `pv_power`, `expected_power`, `pv_ratio`,
 `sunny_score`, `confidence`, `reference_samples`, `learning`, `lux`,
 `cloud_cover`, `temperature`, `threshold_on`, `threshold_off` und `reason`.
+Der Dachfenstersensor ergänzt `surface_azimuth`, `surface_tilt` und
+`incidence_factor`.
+
+## Aktualisierung
+
+### Über HACS
+
+Ein vorhandener Helfer muss nicht gelöscht werden. Nachdem auf GitHub ein neuer
+Release mit passender Versionsnummer in `manifest.json` veröffentlicht wurde:
+
+1. HACS öffnen und die Repository-Informationen aktualisieren.
+2. Das angebotene SunnySense-Update installieren.
+3. Home Assistant neu starten, wenn HACS dazu auffordert.
+
+Config Entry, Entitäts-ID und die in `.storage` gespeicherten Lernwerte bleiben
+erhalten. Nach Version 0.2.0 erscheint zusätzlich der Dachfenstersensor.
+
+### Manuelle Installation
+
+Den vorhandenen Ordner `/config/custom_components/is_sunny` durch den neuen
+Ordner ersetzen und Home Assistant neu starten. Auch hierbei darf die
+Integration vorher eingerichtet bleiben. Vor manuellen Änderungen empfiehlt
+sich ein Home-Assistant-Backup.
+
+Ein Löschen und erneutes Einrichten ist nur bei einer beschädigten Konfiguration
+oder wenn ausdrücklich komplett neu gelernt werden soll sinnvoll. Beim normalen
+Update würde es unnötig Konfiguration und möglicherweise Lernhistorie verlieren.
 
 Die Optionen der Integration erlauben das manuelle Fixieren der Schwellen, der
 minimalen Sonnenelevation und der nötigen Stichprobenzahl. Es gilt immer:

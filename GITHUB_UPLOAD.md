@@ -15,7 +15,7 @@ Repository-Name: `SunnySense`.
 3. Den gesamten Inhalt dieses Pakets einschließlich `.github`,
    `custom_components`, `tools` und der Dateien im Stammverzeichnis hochladen.
 4. Als Commit-Nachricht `Initial release 0.1.0` verwenden.
-5. Unter **Releases → Draft a new release** den Tag `0.1.0` erstellen und
+5. Unter **Releases → Draft a new release** den Tag `0.2.0` erstellen und
    veröffentlichen. Der Release-Workflow hängt das Installations-ZIP an.
 
 ## Installation als benutzerdefiniertes HACS-Repository

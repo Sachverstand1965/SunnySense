@@ -35,3 +35,11 @@ FACADES = (
 
 # Direct light can reach a facade while the sun is within 85° of its normal.
 FACADE_HALF_ANGLE = 85.0
+
+ROOF_WINDOWS = (
+    {"name": "roof_northeast", "bearing": 25.0, "tilt": 42.0},
+)
+
+MODEL_NAMES = tuple(facade["name"] for facade in FACADES) + tuple(
+    roof["name"] for roof in ROOF_WINDOWS
+)

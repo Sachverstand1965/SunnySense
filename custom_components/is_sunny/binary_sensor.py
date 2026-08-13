@@ -15,9 +15,9 @@ from . import RuntimeData
 from .const import (
     CONF_AZIMUTH, CONF_CLOUD, CONF_ELEVATION, CONF_LUX, CONF_MIN_ELEVATION,
     CONF_MIN_SAMPLES, CONF_OFF_THRESHOLD, CONF_ON_THRESHOLD, CONF_PV,
-    CONF_TEMPERATURE, DEFAULTS,
+    CONF_TEMPERATURE, DEFAULTS, ROOF_WINDOWS,
 )
-from .model import active_facade, learning_allowed
+from .model import active_facade, incidence_factor, learning_allowed
 
 
 def _number(hass: HomeAssistant, entity_id: str) -> float | None:
@@ -31,7 +31,10 @@ def _number(hass: HomeAssistant, entity_id: str) -> float | None:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities) -> None:
-    async_add_entities([IsSunnyBinarySensor(hass, entry)])
+    async_add_entities([
+        IsSunnyBinarySensor(hass, entry),
+        IsSunnyBinarySensor(hass, entry, roof=ROOF_WINDOWS[0]),
+    ])
 
 
 class IsSunnyBinarySensor(RestoreEntity, BinarySensorEntity):
@@ -39,11 +42,16 @@ class IsSunnyBinarySensor(RestoreEntity, BinarySensorEntity):
     _attr_name = "Is Sunny"
     _attr_icon = "mdi:white-balance-sunny"
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+    def __init__(
+        self, hass: HomeAssistant, entry: ConfigEntry, roof: dict[str, Any] | None = None
+    ) -> None:
         self.hass = hass
         self.entry = entry
+        self.roof = roof
         self.runtime: RuntimeData = entry.runtime_data
-        self._attr_unique_id = f"{entry.entry_id}_is_sunny"
+        suffix = "is_sunny_roof_window" if roof else "is_sunny"
+        self._attr_unique_id = f"{entry.entry_id}_{suffix}"
+        self._attr_name = "Is Sunny Roof Window" if roof else "Is Sunny"
         self._attr_is_on: bool | None = None
         self._attrs: dict[str, Any] = {}
         self._last_saved = None
@@ -81,18 +89,37 @@ class IsSunnyBinarySensor(RestoreEntity, BinarySensorEntity):
             self._attr_is_on = None
             self._attrs = {"reason": "required_input_unavailable"}
             return
-        facade = active_facade(az)
         min_el = float(data.get(CONF_MIN_ELEVATION, DEFAULTS[CONF_MIN_ELEVATION]))
-        if facade is None or el < min_el:
+        incidence = None
+        if self.roof:
+            incidence = incidence_factor(
+                az, el, self.roof["bearing"], self.roof["tilt"]
+            )
+            surface = self.roof if incidence >= 0.10 else None
+        else:
+            surface = active_facade(az)
+        if surface is None or el < min_el:
             self._attr_is_on = False
-            self._attrs = {"reason": "no_facade_illuminated", "azimuth": az, "elevation": el}
+            self._attrs = {
+                "reason": "no_surface_illuminated" if self.roof else "no_facade_illuminated",
+                "azimuth": az,
+                "elevation": el,
+            }
+            if self.roof:
+                self._attrs.update({
+                    "surface": self.roof["name"],
+                    "surface_azimuth": self.roof["bearing"],
+                    "surface_tilt": self.roof["tilt"],
+                    "incidence_factor": round(incidence, 3),
+                })
             return
-        estimate = self.runtime.model.estimate(facade["name"], az, el)
+        model_name = surface["name"]
+        estimate = self.runtime.model.estimate(model_name, az, el)
         learning = learning_allowed(elevation=el, pv=pv, lux=lux, cloud=cloud, temperature=temp)
         if learning:
-            self.runtime.model.learn(facade["name"], az, el, pv)
+            self.runtime.model.learn(model_name, az, el, pv)
             self._schedule_save()
-            estimate = self.runtime.model.estimate(facade["name"], az, el)
+            estimate = self.runtime.model.estimate(model_name, az, el)
         minimum = int(data.get(CONF_MIN_SAMPLES, DEFAULTS[CONF_MIN_SAMPLES]))
         ratio = pv / estimate.expected if estimate.expected and estimate.expected > 0 else None
         clearly_cloudy = (
@@ -100,9 +127,9 @@ class IsSunnyBinarySensor(RestoreEntity, BinarySensorEntity):
             and lux is not None and lux < 20_000
         )
         if ratio is not None and (learning or clearly_cloudy):
-            self.runtime.model.adapt_thresholds(facade["name"], ratio, learning)
+            self.runtime.model.adapt_thresholds(model_name, ratio, learning)
             self._schedule_save()
-        adaptive = self.runtime.model.thresholds[facade["name"]]
+        adaptive = self.runtime.model.thresholds[model_name]
         if ratio is None or estimate.samples < minimum:
             self._attr_is_on = None
             reason = "learning_reference_curve"
@@ -114,8 +141,9 @@ class IsSunnyBinarySensor(RestoreEntity, BinarySensorEntity):
             self._attr_is_on = ratio >= threshold
             reason = "hysteresis_decision"
         self._attrs = {
-            "reason": reason, "active_facade": facade["name"],
-            "facade_bearing": facade["bearing"], "azimuth": round(az, 1),
+            "reason": reason,
+            "active_surface": model_name,
+            "azimuth": round(az, 1),
             "elevation": round(el, 1), "pv_power": round(pv, 1),
             "expected_power": round(estimate.expected, 1) if estimate.expected else None,
             "pv_ratio": round(ratio, 3) if ratio is not None else None,
@@ -127,6 +155,18 @@ class IsSunnyBinarySensor(RestoreEntity, BinarySensorEntity):
             "threshold_off": round(self.entry.options.get(CONF_OFF_THRESHOLD, adaptive["off"]), 3),
             "threshold_mode": "manual" if CONF_ON_THRESHOLD in self.entry.options else "adaptive",
         }
+        if self.roof:
+            self._attrs.update({
+                "surface": model_name,
+                "surface_azimuth": surface["bearing"],
+                "surface_tilt": surface["tilt"],
+                "incidence_factor": round(incidence, 3),
+            })
+        else:
+            self._attrs.update({
+                "active_facade": model_name,
+                "facade_bearing": surface["bearing"],
+            })
 
     def _schedule_save(self) -> None:
         """Coalesce writes through Store's delayed-save mechanism."""

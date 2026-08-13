@@ -1,4 +1,6 @@
-from custom_components.is_sunny.model import SunnyModel, active_facade, learning_allowed
+from custom_components.is_sunny.model import (
+    SunnyModel, active_facade, incidence_factor, learning_allowed,
+)
 
 
 def test_facade_selection_and_wraparound():
@@ -12,6 +14,12 @@ def test_facade_selection_and_wraparound():
 def test_overlap_uses_nearest_facade():
     assert active_facade(250)["name"] == "southwest"
     assert active_facade(260)["name"] == "northwest"
+
+
+def test_roof_window_incidence_geometry():
+    facing = incidence_factor(25, 48, 25, 42)
+    assert facing > 0.99
+    assert incidence_factor(205, 10, 25, 42) < 0
 
 
 def test_learning_and_roundtrip():

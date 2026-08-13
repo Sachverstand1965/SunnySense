@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import exp
+from math import cos, exp, radians, sin
 from typing import Any
 
-from .const import FACADES, FACADE_HALF_ANGLE
+from .const import FACADES, FACADE_HALF_ANGLE, MODEL_NAMES
 
 
 def circular_distance(a: float, b: float) -> float:
@@ -22,6 +22,20 @@ def active_facade(azimuth: float) -> dict[str, Any] | None:
         if circular_distance(azimuth, facade["bearing"]) <= FACADE_HALF_ANGLE
     ]
     return min(candidates, key=lambda f: circular_distance(azimuth, f["bearing"]), default=None)
+
+
+def incidence_factor(azimuth: float, elevation: float, bearing: float, tilt: float) -> float:
+    """Return cosine of incidence angle for a tilted surface.
+
+    Tilt is measured from horizontal: 0° is flat, 90° is vertical.
+    """
+    elevation_rad = radians(elevation)
+    tilt_rad = radians(tilt)
+    azimuth_delta = radians(circular_distance(azimuth, bearing))
+    return (
+        sin(elevation_rad) * cos(tilt_rad)
+        + cos(elevation_rad) * sin(tilt_rad) * cos(azimuth_delta)
+    )
 
 
 def cell_key(azimuth: float, elevation: float) -> str:
@@ -41,14 +55,14 @@ class SunnyModel:
 
     def __init__(self, raw: dict[str, Any] | None = None) -> None:
         self.cells: dict[str, dict[str, dict[str, float | int]]] = {
-            f["name"]: {} for f in FACADES
+            name: {} for name in MODEL_NAMES
         }
         if raw:
             for facade, cells in raw.get("cells", {}).items():
                 if facade in self.cells and isinstance(cells, dict):
                     self.cells[facade] = cells
         self.thresholds: dict[str, dict[str, float]] = {
-            f["name"]: {"on": 0.82, "off": 0.68} for f in FACADES
+            name: {"on": 0.82, "off": 0.68} for name in MODEL_NAMES
         }
         if raw:
             for facade, values in raw.get("thresholds", {}).items():

@@ -2,6 +2,19 @@
 
 Alle wesentlichen Änderungen werden hier dokumentiert.
 
+## [0.2.0] - 2026-08-13
+
+### Hinzugefügt
+
+- Separater `binary_sensor.is_sunny_roof_window` für das Dachfenster mit 25°
+  Ausrichtung und 42° Dachneigung.
+- Physikalische Berechnung des Einfallswinkels auf die geneigte Scheibe.
+- Eigenständige Referenzkurve und adaptive Hysterese für das Dachfenster.
+
+### Kompatibilität
+
+- Der bestehende `binary_sensor.is_sunny` und seine Lernwerte bleiben erhalten.
+
 ## [0.1.1] - 2026-08-13
 
 ### Geändert
