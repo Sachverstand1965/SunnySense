@@ -2,6 +2,14 @@
 
 Alle wesentlichen Änderungen werden hier dokumentiert.
 
+## [0.1.1] - 2026-08-13
+
+### Geändert
+
+- Relevanter Sonnenbereich für jede Fassade einheitlich auf ±85° erweitert.
+- In überlappenden Bereichen wird weiterhin die winkelmäßig nächste Fassade
+  gewählt.
+
 ## [0.1.0] - 2026-08-13
 
 ### Hinzugefügt

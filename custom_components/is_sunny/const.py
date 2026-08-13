@@ -28,7 +28,10 @@ DEFAULTS = {
 }
 
 FACADES = (
-    {"name": "northeast", "bearing": 25.0, "start": 340.0, "end": 90.0},
-    {"name": "southwest", "bearing": 205.0, "start": 140.0, "end": 270.0},
-    {"name": "northwest", "bearing": 295.0, "start": 250.0, "end": 340.0},
+    {"name": "northeast", "bearing": 25.0},
+    {"name": "southwest", "bearing": 205.0},
+    {"name": "northwest", "bearing": 295.0},
 )
+
+# Direct light can reach a facade while the sun is within 85° of its normal.
+FACADE_HALF_ANGLE = 85.0

@@ -1,7 +1,7 @@
 # Self-learning Is Sunny for Home Assistant
 
-[![Validate](https://github.com/YOUR_GITHUB_USERNAME/ha-is-sunny/actions/workflows/validate.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/ha-is-sunny/actions/workflows/validate.yml)
-[![GitHub Release](https://img.shields.io/github/v/release/YOUR_GITHUB_USERNAME/ha-is-sunny)](https://github.com/YOUR_GITHUB_USERNAME/ha-is-sunny/releases)
+[![Validate](https://github.com/Sachverstand1965/SunnySense/actions/workflows/validate.yml/badge.svg)](https://github.com/Sachverstand1965/SunnySense/actions/workflows/validate.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/Sachverstand1965/SunnySense)](https://github.com/Sachverstand1965/SunnySense/releases)
 
 Eine lokale Custom Integration, die genau einen `binary_sensor.is_sunny` für
 Adaptive Cover Pro bereitstellt. Intern nutzt sie getrennte Referenzmodelle für
@@ -53,10 +53,12 @@ Cover Pro kann dann auf seine Wetterlogik zurückfallen.
 
 | Modell | Ausrichtung | aktiver Sonnenazimut |
 |---|---:|---:|
-| Nordost | 25° | 340°–90° |
-| Südwest | 205° | 140°–270° |
-| Nordwest | 295° | 250°–340° |
+| Nordost | 25° | 300°–110° |
+| Südwest | 205° | 120°–290° |
+| Nordwest | 295° | 210°–20° |
 
+Jeder Bereich entspricht ±85° um die Fassadennormale. In überlappenden
+Bereichen wird die Fassade mit dem kleinsten Winkelabstand ausgewählt.
 Außerhalb dieser Bereiche oder unter 5° Sonnenelevation ist der Sensor `off`.
 Die Bereiche beschreiben, wann die Sonne geometrisch vor einer Fassade liegt;
 Gebäudeüberstände oder Bäume können eine spätere Anpassung erfordern.

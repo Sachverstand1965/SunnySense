@@ -2,11 +2,10 @@
 
 ## Vor dem ersten Upload
 
-Ersetze in `custom_components/is_sunny/manifest.json` zweimal
-`YOUR_GITHUB_USERNAME` durch deinen GitHub-Benutzernamen. Optional kann in der
-MIT-Lizenz der Copyright-Inhaber angepasst werden.
+Die Repository-Links sind bereits auf `Sachverstand1965/SunnySense` eingestellt.
+Optional kann in der MIT-Lizenz der Copyright-Inhaber angepasst werden.
 
-Empfohlener Repository-Name: `ha-is-sunny`.
+Repository-Name: `SunnySense`.
 
 ## Upload über die GitHub-Webseite
 

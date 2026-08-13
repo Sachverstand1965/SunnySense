@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from math import exp
 from typing import Any
 
-from .const import FACADES
+from .const import FACADES, FACADE_HALF_ANGLE
 
 
 def circular_distance(a: float, b: float) -> float:
@@ -14,13 +14,13 @@ def circular_distance(a: float, b: float) -> float:
     return abs((a - b + 180.0) % 360.0 - 180.0)
 
 
-def _in_range(value: float, start: float, end: float) -> bool:
-    return start <= value <= end if start <= end else value >= start or value <= end
-
-
 def active_facade(azimuth: float) -> dict[str, Any] | None:
     """Select the nearest facade whose illumination sector contains azimuth."""
-    candidates = [f for f in FACADES if _in_range(azimuth, f["start"], f["end"])]
+    candidates = [
+        facade
+        for facade in FACADES
+        if circular_distance(azimuth, facade["bearing"]) <= FACADE_HALF_ANGLE
+    ]
     return min(candidates, key=lambda f: circular_distance(azimuth, f["bearing"]), default=None)
 
 
